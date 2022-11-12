@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Runtime.CompilerServices;
 
 namespace lab7
@@ -12,7 +13,11 @@ namespace lab7
         public static string chessman; // Переменная вида шахматной фигуры
         static void Main(string[] args)
         {
-            Console.WriteLine("Программа отвечает на вопрос: может ли шахматная фигура выполнить ход по заданным координатам");
+            string path = "Logger.txt"; // Путь к файлу для логирования
+            string message = "Пользователь запустил программу"; // Сообщение, передаваемое в лог-файл при запуске
+            WriteInFile(path, message);
+
+            Console.WriteLine("Программа отвечает на вопрос: может ли шахматная фигура выполнить ход по координатам");
             Console.WriteLine("k — вертик. координата (счет слева направо), y — гориз. координата (счет снизу вверх)");
 
             int k = InputPoints("k");
@@ -51,19 +56,38 @@ namespace lab7
                         }
                         else if (chessman == "слон")
                         {
-                            Console.WriteLine(CheckSecondForBishop(k, l, m, n)); 
+                            Console.WriteLine(CheckSecondForBishop(k, l, m, n));
                         }
                         else if (chessman == "ферзь")
                         {
                             Console.WriteLine($"Можно попробовать через промежуточный ход. Подходят точки: [{k}, {n}] или [{m}, {l}]");
                             Console.WriteLine(CheckSecondForBishop(k, l, m, n));
-                        }    
+                        }
                     }
                     break;
-                }    
+                }
             }
             Console.Write("Работа программы завершена. Для выхода из консоли нажмите Enter");
             Console.ReadLine();
+
+            message = "Работа программы завершена"; // Сообщение, передаваемое в лог-файл при завершении работы программы
+            WriteInFile(path, message);
+        }
+
+        private static void WriteInFile(string path, string message) // Метод записи в лог-файл
+        {
+            if (!File.Exists(path)) // Проверка существования файла для логирования
+            {
+                var sw = new StreamWriter(path); // Создание лог-файла (вызывается, если файл еще не создан)
+                sw.WriteLine(DateTime.Now.ToString() + " " + message); // Запись в лог-файл времени обращения и сообщения
+                sw.Close(); // Закрытие файла
+            }
+            else
+            {
+                StreamWriter sw = File.AppendText(path); // Преобразует читаемый файл в файл для дозаписи
+                sw.WriteLine(DateTime.Now.ToString() + " " + message);
+                sw.Close();
+            }
         }
 
         private static string CheckSecondForBishop(int k, int l, int m, int n)
