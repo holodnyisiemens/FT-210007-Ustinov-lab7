@@ -10,12 +10,13 @@ namespace lab7
 {
     internal class Program
     {
+        public static string indent = "    ";   // Отступ для вывода сообщений (вызванных после запуска и до завершения) в лог-файл
         public static string path = "Logger.txt"; // Путь к файлу для логирования
         public static string chessman; // Переменная вида шахматной фигуры
         static void Main(string[] args)
         {
             string message = "Пользователь запустил программу"; // Сообщение, передаваемое в лог-файл при запуске
-            WriteInFile(path, message);
+            WriteInFile("", path, message);
 
             Console.WriteLine("Программа отвечает на вопрос: может ли шахматная фигура выполнить ход по координатам");
             Console.WriteLine("k — вертик. координата (счет слева направо), y — гориз. координата (счет снизу вверх)");
@@ -27,6 +28,7 @@ namespace lab7
 
             while (k == m && l == n) // Запустится, если пользователь введет одинаковые координаты
             {
+                WriteInFile(indent, path, $"Пользователь ввел число: {n}, но координаты должны отличаться");
                 Console.WriteLine("Координаты должны быть разными");
                 n = InputPoints("n");
             }
@@ -38,10 +40,10 @@ namespace lab7
             {
                 Console.Write("Введите фигуру (конь, ладья, ферзь, слон): ");
                 chessman = Console.ReadLine();
-                WriteInFile(path, $"Пользователь ввел: {chessman}");
 
                 if (chessman == "конь" || chessman == "ладья" || chessman == "ферзь" || chessman == "слон")
                 {
+                    WriteInFile(indent, path, $"Пользователь ввел: {chessman}");
                     if (GeneralCheck(k, l, m, n, chessman) == true)
                     {
                         Console.WriteLine("Ход возможен");
@@ -67,25 +69,30 @@ namespace lab7
                     }
                     break;
                 }
+                else
+                {
+                    WriteInFile(indent, path, $"Пользователь ввел некорректные данные: {chessman}");
+                    Console.WriteLine("Ошибка ввода. Попробуйте еще раз");
+                }
             }
+
             Console.Write("Работа программы завершена. Для выхода из консоли нажмите Enter");
             Console.ReadLine();
 
-            message = "Работа программы завершена"; // Сообщение, передаваемое в лог-файл при завершении работы программы
-            WriteInFile(path, message);
+            WriteInFile("", path, "Работа программы завершена");
         }
 
-        private static void WriteInFile(string path, string message) // Метод записи в лог-файл
+        private static void WriteInFile(string indent, string path, string message) // Метод записи в лог-файл
         {
             if (!File.Exists(path)) // Проверка существования файла для логирования
             {
                 using var sw = new StreamWriter(path); // Создание лог-файла (вызывается, если файл еще не создан)
-                sw.WriteLine(DateTime.Now.ToString() + " " + message); // Запись в лог-файл времени обращения и сообщения
+                sw.WriteLine(indent + DateTime.Now.ToString() + ' ' + message); // Запись в лог-файл времени обращения и сообщения
             }
             else
             {
                 using var sw = File.AppendText(path); // Преобразует читаемый файл в файл для дозаписи
-                sw.WriteLine(DateTime.Now.ToString() + " " + message);
+                sw.WriteLine(indent + DateTime.Now.ToString() + ' ' + message);
             }
         }
 
@@ -135,17 +142,25 @@ namespace lab7
             {
                 Console.Write($"Введите {coordinate} (от 1 до 8): ");
                 string input = Console.ReadLine();
-                WriteInFile(path, $"Пользователь ввел: {input}");
 
                 try
                 {
                     number = int.Parse(input);
-                    
-                    if (number >= 1 && number <= 8) break;
-                    else Console.WriteLine("Число должно быть от 1 до 8");
+
+                    if (number >= 1 && number <= 8)
+                    {
+                        WriteInFile(indent, path, $"Пользователь ввел число: {number}");
+                        break;
+                    }
+                    else
+                    {
+                        WriteInFile(indent, path, $"Пользователь ввел число, не удовл. условиям: {number}");
+                        Console.WriteLine("Число должно быть от 1 до 8");
+                    }
                 }
                 catch (Exception)
                 {
+                    WriteInFile(indent, path, $"Пользователь ввел некорректные данные: {input}");
                     Console.WriteLine("Ошибка ввода. Попробуйте еще раз");
                 }
             }
