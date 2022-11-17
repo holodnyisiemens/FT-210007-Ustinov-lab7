@@ -10,10 +10,10 @@ namespace lab7
 {
     internal class Program
     {
+        public static string path = "Logger.txt"; // Путь к файлу для логирования
         public static string chessman; // Переменная вида шахматной фигуры
         static void Main(string[] args)
         {
-            string path = "Logger.txt"; // Путь к файлу для логирования
             string message = "Пользователь запустил программу"; // Сообщение, передаваемое в лог-файл при запуске
             WriteInFile(path, message);
 
@@ -38,6 +38,7 @@ namespace lab7
             {
                 Console.Write("Введите фигуру (конь, ладья, ферзь, слон): ");
                 chessman = Console.ReadLine();
+                WriteInFile(path, $"Пользователь ввел: {chessman}");
 
                 if (chessman == "конь" || chessman == "ладья" || chessman == "ферзь" || chessman == "слон")
                 {
@@ -78,15 +79,13 @@ namespace lab7
         {
             if (!File.Exists(path)) // Проверка существования файла для логирования
             {
-                var sw = new StreamWriter(path); // Создание лог-файла (вызывается, если файл еще не создан)
+                using var sw = new StreamWriter(path); // Создание лог-файла (вызывается, если файл еще не создан)
                 sw.WriteLine(DateTime.Now.ToString() + " " + message); // Запись в лог-файл времени обращения и сообщения
-                sw.Close(); // Закрытие файла
             }
             else
             {
-                StreamWriter sw = File.AppendText(path); // Преобразует читаемый файл в файл для дозаписи
+                using var sw = File.AppendText(path); // Преобразует читаемый файл в файл для дозаписи
                 sw.WriteLine(DateTime.Now.ToString() + " " + message);
-                sw.Close();
             }
         }
 
@@ -136,6 +135,7 @@ namespace lab7
             {
                 Console.Write($"Введите {coordinate} (от 1 до 8): ");
                 string input = Console.ReadLine();
+                WriteInFile(path, $"Пользователь ввел: {input}");
 
                 try
                 {
